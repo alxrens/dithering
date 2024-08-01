@@ -4,14 +4,14 @@ use image::{DynamicImage, Luma, Rgba};
 
 
 
-pub fn bw_dithering(img : &DynamicImage) -> DynamicImage {
+pub fn bw_dithering(img : &DynamicImage, treshold : i32) -> DynamicImage {
     let mut img = img.to_luma8();
     let (width, height) = img.dimensions();
 
     for y in 0..height {
         for x in 0..width {
             let old_pixel = img.get_pixel(x, y).0[0] as i32;
-            let new_pixel  = if old_pixel > 64 { 255 } else { 0 };
+            let new_pixel  = if old_pixel > treshold { 255 } else { 0 };
             img.put_pixel(x, y, Luma([new_pixel as u8]));
             let quant_error = old_pixel - new_pixel as i32;
 
@@ -46,7 +46,7 @@ pub fn bw_dithering(img : &DynamicImage) -> DynamicImage {
 
 
 
-pub fn colored_dithering(img : &DynamicImage) -> DynamicImage {
+pub fn colored_dithering(img : &DynamicImage, treshold : u8) -> DynamicImage {
     let mut img = img.to_rgba8();
     let (width, height) = img.dimensions();
 
@@ -54,9 +54,9 @@ pub fn colored_dithering(img : &DynamicImage) -> DynamicImage {
         for x in 0..width {
             let old_pixel = img.get_pixel(x, y).clone();
             let new_pixel = Rgba([
-                if old_pixel[0] > 64 { 255 } else { 0 },
-                if old_pixel[1] > 64 { 255 } else { 0 },
-                if old_pixel[2] > 64 { 255 } else { 0 },
+                if old_pixel[0] > treshold { 255 } else { 0 },
+                if old_pixel[1] > treshold { 255 } else { 0 },
+                if old_pixel[2] > treshold { 255 } else { 0 },
                 old_pixel[3]
             ]);
 
